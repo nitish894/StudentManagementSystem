@@ -1,0 +1,55 @@
+package com.nitish.sms.model.controller;
+
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebFilter;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+import java.io.IOException;
+
+@WebFilter({
+        "/student",
+        "/dashboard.html",
+        "/views/*"
+})
+public class AdminAuthFilter implements Filter {
+
+    @Override
+    public void init(FilterConfig filterConfig) {
+        System.out.println("Admin Authentication Filter initialized");
+    }
+
+    @Override
+    public void doFilter(ServletRequest request,
+                         ServletResponse response,
+                         FilterChain chain)
+            throws IOException, ServletException {
+
+        HttpServletRequest req = (HttpServletRequest) request;
+        HttpServletResponse res = (HttpServletResponse) response;
+
+        HttpSession session = req.getSession(false);
+
+        if (session != null &&
+                session.getAttribute("loggedInAdmin") != null) {
+
+            chain.doFilter(request, response);
+
+        } else {
+
+            res.sendRedirect(
+                    req.getContextPath() + "/login.jsp");
+        }
+    }
+
+    @Override
+    public void destroy() {
+        System.out.println("Admin Authentication Filter destroyed");
+    }
+}
